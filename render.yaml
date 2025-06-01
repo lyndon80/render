@@ -1,7 +1,10 @@
 # Generated/edited by ChatGPT on 2025-06-01
 services:
   - type: web
-    name: toast-summary-api
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: poetry run python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    name: toastapi
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PORT
+        value: 10000
