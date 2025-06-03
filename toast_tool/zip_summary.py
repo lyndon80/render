@@ -2,6 +2,7 @@ import zipfile
 import pandas as pd
 from pathlib import Path
 import tempfile
+import shutil
 
 def summarize_toast_zip(zip_bytes: bytes) -> pd.DataFrame:
     with tempfile.TemporaryDirectory() as tempdir:
@@ -10,7 +11,17 @@ def summarize_toast_zip(zip_bytes: bytes) -> pd.DataFrame:
         zip_path.write_bytes(zip_bytes)
 
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_path)
+            for member in zip_ref.infolist():
+                member_path = extract_path / member.filename
+                resolved_path = member_path.resolve()
+                if not str(resolved_path).startswith(str(extract_path.resolve())):
+                    raise Exception(f"Unsafe path detected: {member.filename}")
+                if member.is_dir():
+                    resolved_path.mkdir(parents=True, exist_ok=True)
+                else:
+                    resolved_path.parent.mkdir(parents=True, exist_ok=True)
+                    with zip_ref.open(member) as source, open(resolved_path, "wb") as target:
+                        shutil.copyfileobj(source, target)
 
         all_items = list(extract_path.rglob("*AllItemsReport.csv"))
         if not all_items:
