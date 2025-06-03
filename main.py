@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
-from toast_tool.zip_summary import summarize_toast_zip
+from toast_summary_api.toast_tool.zip_summary import summarize_toast_zip
 
 app = FastAPI(
     title="Toast Summary API",
